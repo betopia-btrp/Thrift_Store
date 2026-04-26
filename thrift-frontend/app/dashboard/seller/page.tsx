@@ -96,6 +96,17 @@ function SellerDashboardContent() {
     )
   }
 
+  const activateListing = async (id: string) => {
+    try {
+      await api.patch(`/seller/products/${id}/activate`)
+      setListings((prev) =>
+        prev.map((l) => (l.product_id === id ? { ...l, status: 'active' } : l))
+      )
+    } catch (err: any) {
+      alert(err.response?.data?.meta?.message || 'Failed to activate')
+    }
+  }
+
   const refreshListings = async () => {
   try {
     const res = await api.get('/seller/listings')
@@ -271,6 +282,10 @@ useEffect(() => {
 
             <div className="flex gap-2">
               <Link href={`/listings/${l.product_id}/edit`}>Edit</Link>
+
+              {l.status === 'draft' && (
+                <button onClick={() => activateListing(l.product_id)}>Activate</button>
+              )}
 
               {l.status === 'active' && (
                 <>
