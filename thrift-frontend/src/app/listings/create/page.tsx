@@ -65,13 +65,13 @@ export default function CreateListingPage() {
       Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v) })
       files.forEach((f) => fd.append('images[]', f))
 
-      await api.post('/listings', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      await api.post('/listings', fd)
       toast.success('Listing created as draft!')
       router.push('/dashboard/seller')
     } catch (err: any) {
-      toast.error(err.response?.data?.meta?.message || 'Failed to create listing')
+      const data = err.response?.data
+      const msg = data?.meta?.message || data?.message || Object.values(data?.errors || {}).flat().join(', ') || 'Failed to create listing'
+      toast.error(msg)
     } finally {
       setLoading(false)
     }
